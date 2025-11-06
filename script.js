@@ -20,7 +20,9 @@ for(let y = 0; y < rows; y++) {
 }
 
 function draw() {
-    ctx.clearRect (0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#161a36";
+    ctx.fillRect (0, 0, canvas.width, canvas.height);
+    
     ctx.fillStyle = "#5ad28a";
 
     for (let y = 0; y < rows; y++) {
