@@ -10,4 +10,5 @@ canvas {
     background: #161a36;
     border-radius: 12px;
     cursor: crosshair;
+    box-shadow: 0 0 10px #000300;
 }
