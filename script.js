@@ -1,11 +1,17 @@
 const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
 const stepBtn = document.getElementById("stepBtn");
+const playBtn = document.getElementById("playBtn");
+const speedBtn = document.getElementById("speedBtn");
 
 //Configuration
 const cellSize = 10; //px
 const cols = canvas.width / cellSize;
 const rows = canvas.height / cellSize;
+
+let running = false;
+let speed= 500;
+let lastTime = 0;
 
 let world = [];
 
@@ -16,6 +22,40 @@ for(let y = 0; y < rows; y++) {
         world[y][x] = Math.random() < 0.5 ? 1 : 0; //25% alive
     }
 }
+
+//Main animation loop
+function loop(timestamp) {
+    if (!running) return;
+    if (timestamp - lastTime > speed) {
+        nextGeneration();
+        lastTime = timestamp;
+    }
+    requestAnimationFrame(loop);
+}
+
+//Play/Pause toggle
+playBtn.addEventListener("click", () => {
+    running = !running;
+    playBtn.textContent = running ? "Pause" : "Play";
+    if (running) {
+        lastTime = performance.now();
+        requestAnimationFrame(loop);
+    }
+});
+
+//Speed control
+speedBtn.addEventListener("click", () => {
+    if (speed === 500) {
+        speed = 200;
+        speedBtn.textContent = "Speed x2";
+    } else if (speed === 200) {
+        speed = 100;
+        speedBtn.textContent = "Speed x4";
+    } else {
+        speed= 500;
+        speedBtn.textContent = "Speed x1";
+    }
+});
 
 function draw() {
     ctx.fillStyle = "#161a36";
