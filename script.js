@@ -3,6 +3,8 @@ const ctx = canvas.getContext("2d");
 const stepBtn = document.getElementById("stepBtn");
 const playBtn = document.getElementById("playBtn");
 const speedBtn = document.getElementById("speedBtn");
+const clearBtn = document.getElementById("clearBtn");
+const patternSelect = document.getElementById("patternSelect");
 
 //Configuration
 const cellSize = 10; //px
@@ -19,7 +21,7 @@ let world = [];
 for(let y = 0; y < rows; y++) {
     world[y] = new Uint8Array(cols);
     for (let x = 0; x < cols; x++) {
-        world[y][x] = Math.random() < 0.5 ? 1 : 0; //25% alive
+        world[y][x] = Math.random() < 0.3 ? 1 : 0; //25% alive
     }
 }
 
@@ -55,6 +57,57 @@ speedBtn.addEventListener("click", () => {
         speed= 500;
         speedBtn.textContent = "Speed x1";
     }
+});
+
+//Mouse click handler
+canvas.addEventListener("click", (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((event.clientX - rect.left) / cellSize);
+    const y = Math.floor((event.clientY - rect.top) / cellSize);
+
+    if (x >= 0 && x < cols && y >= 0 && y < rows) {
+        world[y][x] = world[y][x] ? 0 : 1;
+        draw();
+    }
+});
+
+//Clear world
+clearBtn.addEventListener("click", () => {
+    for (let y = 0; y < rows; y++) world[y].fill(0);
+    draw();
+});
+
+//Patterns
+const patterns = {
+    glider: [
+        [1, 0], [2, 1], [0, 2], [1, 2], [2, 2]
+    ],
+    blinker: [
+        [1, 0], [1, 1], [1, 2]
+    ],
+    block: [
+        [0, 0], [1, 0], [0, 1], [1, 1]
+    ]
+};
+
+//Load pattern
+patternSelect.addEventListener("change", (event) => {
+    const pattern = event.target.value;
+    if (pattern === "none") return;
+
+    for (let y = 0; y < rows; y++) world[y].fill(0);
+
+    const offsetX = Math.floor(cols / 2);
+    const offsetY = Math.floor(rows / 2);
+
+    patterns[pattern].forEach(([px, py]) => {
+        const x = offsetX + px;
+        const y = offsetY + py;
+        if (x < cols && y < rows) world[y][x] = 1;
+    });
+
+    draw();
+    patternSelect.value = "none";
 });
 
 function draw() {
