@@ -173,7 +173,9 @@ function countNeighbors(x, y) {
     for (let dy = -1; dy <= 1; dy++) {
         for (let dx = -1; dx <= 1; dx++) {
             if (dx === 0 && dy === 0) continue;
-            n += world[y + dy]?.[x + dx] ?? 0;
+            const nx = (x + dx + cols) % cols;
+            const ny = (y + dy + rows) % rows;
+            n += world[ny][nx];
         }
     }
     return n;
