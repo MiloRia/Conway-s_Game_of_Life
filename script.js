@@ -5,6 +5,7 @@ const playBtn = document.getElementById("playBtn");
 const speedBtn = document.getElementById("speedBtn");
 const clearBtn = document.getElementById("clearBtn");
 const patternSelect = document.getElementById("patternSelect");
+const statusEl = document.getElementById("status");
 
 //Configuration
 const cellSize = 10; //px
@@ -14,6 +15,7 @@ const rows = canvas.height / cellSize;
 let running = false;
 let speed= 500;
 let lastTime = 0;
+let generation = 0;
 
 let world = [];
 
@@ -110,12 +112,36 @@ patternSelect.addEventListener("change", (event) => {
     patternSelect.value = "none";
 });
 
+function worldsEqual(a, b) {
+    if (a.length !== b.length) return false;
+    for (let y = 0; y < a.length; y++) {
+        const ra = a[y], rb = b[y];
+        for (let x = 0; x < ra.length; x++) {
+            if (ra[x] !== rb[x]) return false;
+        }
+    }
+    return true;
+}
+
+function countLiveCells(worldRef) {
+    let sum = 0;
+    for (let y = 0; y < rows; y++) {
+        const row = worldRef[y];
+        for (let x = 0; x < cols; x++) sum += row[x];
+    }
+    return sum;
+}
+
+function updateStatus() {
+    const live = countLiveCells(world);
+    statusEl.textContent = `Generation: ${generation} | Live cells: ${live}`;
+}
+
 function draw() {
     ctx.fillStyle = "#161a36";
     ctx.fillRect (0, 0, canvas.width, canvas.height);
     
     ctx.fillStyle = "#5ad28a";
-
     for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++){
             if (world[y][x] === 1) {
@@ -125,6 +151,7 @@ function draw() {
     }
 
     drawGrid();
+    updateStatus();
 }
 
 function drawGrid() {
@@ -169,7 +196,17 @@ function nextGeneration() {
             }
         }
     }
+
+    if (worldsEqual(world, newWorld)) {
+        world = newWorld;
+        draw();
+        running = false;
+        playBtn.textContent = "Play"
+        return;
+    }
+
     world = newWorld;
+    generation++;
     draw();
 }
 
